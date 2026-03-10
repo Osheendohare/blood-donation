@@ -23,6 +23,8 @@ class UserProfile(models.Model):
     password = models.CharField(max_length=128, blank=True, null=True)
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith("pbkdf2_"):
@@ -32,21 +34,10 @@ class UserProfile(models.Model):
 class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'father_name', 'ward', 'address', 'age', 'gender', 'blood_group', 'mobile'],
+                fields=['name', 'father_name', 'ward', 'address', 'age', 'gender', 'blood_group', 'mobile', 'latitude', 'longitude'],
                 name='unique_user_profile_combination'
             )
         ]
-
-# class SuggestionHistory(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='suggestions')
-#     suggested_donor_name = models.CharField(max_length=255)
-#     suggested_donor_mobile = models.CharField(max_length=15)
-#     blood_group = models.CharField(max_length=5)
-#     location = models.CharField(max_length=255)
-#     date_suggested = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Suggestion to {self.user.username} - {self.blood_group}"
 
 class EmergencyRequest(models.Model):
     name = models.CharField(max_length=100)
@@ -57,6 +48,8 @@ class EmergencyRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
 class HealthEligibility(models.Model):
     onMedication = models.CharField(max_length=5)

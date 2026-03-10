@@ -5,6 +5,7 @@ from django.utils import timezone
 from twilio.rest import Client
 import random
 from django.conf import settings
+from .utils import haversine 
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password, make_password
 from .models import UserProfile, EmergencyRequest, BloodCenter, Appointment, CampRegistration, ContactMessage,SuggestedDonor, EmergencyAppointment
@@ -167,20 +168,58 @@ def suggest_donors(request, receiver_id):
     except EmergencyRequest.DoesNotExist:
         return Response({"error": "Receiver not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    # Donors already shown to this receiver
     shown_donor_ids = SuggestedDonor.objects.filter(receiver=receiver).values_list('donor_id', flat=True)
 
-    # Get 10 donors from the same location who haven't been shown
-    new_donors = UserProfile.objects.filter(
-        ward=receiver.ward
-    ).exclude(id__in=shown_donor_ids)[:10]
+    donors_qs = UserProfile.objects.exclude(id__in=shown_donor_ids)
 
-    # Save the new suggestions
-    for donor in new_donors:
-        SuggestedDonor.objects.create(receiver=receiver, donor=donor)
+    # Get lat/lon from query params (frontend may send null if denied)
+    try:
+        lat = request.query_params.get('latitude')
+        lon = request.query_params.get('longitude')
+        lat = float(lat) if lat else None
+        lon = float(lon) if lon else None
+    except:
+        lat = lon = None
 
-    serializer = DonorSerializer(new_donors, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    suggestions = []
+
+    if lat is not None and lon is not None:
+        # Use geolocation to filter nearby donors
+        for donor in donors_qs.exclude(latitude__isnull=True).exclude(longitude__isnull=True):
+            distance = haversine(lat, lon, donor.latitude, donor.longitude)
+            if distance <= 10:  # 10 km radius
+                suggestions.append({
+                    "id": donor.id,
+                    "name": donor.name,
+                    "blood_group": donor.blood_group,
+                    "rh": getattr(donor, 'rh', ''),
+                    "ward": donor.ward,
+                    "mobile": donor.mobile,
+                    "distance": round(distance, 2)
+                })
+        # Sort by distance
+        suggestions.sort(key=lambda x: x['distance'])
+
+    # Fallback to ward-based suggestions if geolocation denied or no nearby donors
+    if not suggestions:
+        ward_donors = donors_qs.filter(ward=receiver.ward)[:10]
+        for donor in ward_donors:
+            suggestions.append({
+                "id": donor.id,
+                "name": donor.name,
+                "blood_group": donor.blood_group,
+                "rh": getattr(donor, 'rh', ''),
+                "ward": donor.ward,
+                "mobile": donor.mobile,
+                "distance": None  # unknown
+            })
+
+    # Save suggested donors
+    for donor in suggestions:
+        SuggestedDonor.objects.get_or_create(receiver=receiver, donor_id=donor['id'])
+
+    return Response(suggestions[:10], status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def send_otp(request):

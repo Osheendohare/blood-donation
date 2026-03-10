@@ -45,7 +45,7 @@ class EmergencyRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmergencyRequest
-        fields = ['id', 'name', 'mobile', 'blood_group', 'ward', 'password', 'confirmPassword']
+        fields = ['id', 'name', 'mobile', 'blood_group', 'ward', 'password', 'confirmPassword', 'latitude', 'longitude']
         extra_kwargs = {
             'password': {'write_only': True}
         }
