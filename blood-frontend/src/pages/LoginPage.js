@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
 
   // 1. Define the API Base URL dynamically
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const API_BASE_URL = "https://blood-backend-s010.onrender.com";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
