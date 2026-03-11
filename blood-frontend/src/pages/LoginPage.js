@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     try {
       // 2. Updated to use the dynamic variable
-      const res = await axios.post(`${API_BASE_URL}/login/`, {
+      const res = await axios.post(`${API_BASE_URL}/api/login/`, {
         mobile: mobile.trim(),
         password,
       });
