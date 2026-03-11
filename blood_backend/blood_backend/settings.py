@@ -1,18 +1,16 @@
 import os
 from pathlib import Path
-import dj_database_url  # Add this
+import dj_database_url
 from decouple import config
 
-# Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start settings
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*'] # In production, replace '*' with your Render URL
+# Add your Render backend URL here
+ALLOWED_HOSTS = ['blood-backend-s010.onrender.com', 'localhost', '127.0.0.1'] 
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -27,9 +25,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Top priority
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Ensure this is below SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -40,7 +38,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'blood_backend.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+# --- CORS & CSRF SETTINGS ---
+# Replace the Netlify URL below with your actual Netlify link
+FRONTEND_URL = 'https://your-app-name.netlify.app' 
+
+CORS_ALLOWED_ORIGINS = [
+    FRONTEND_URL,
+    "http://localhost:3000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    FRONTEND_URL,
+    "https://blood-backend-s010.onrender.com"
+]
+# ----------------------------
 
 TEMPLATES = [
     {
@@ -59,8 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blood_backend.wsgi.application'
 
-# Database Configuration
-# This reads DATABASE_URL from Railway via Render's environment variables
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL'),
@@ -68,7 +77,6 @@ DATABASES = {
     )
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -76,13 +84,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (WhiteNoise setup)
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
