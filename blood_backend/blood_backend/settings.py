@@ -39,16 +39,17 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'blood_backend.urls'
 
 # --- CORS & CSRF SETTINGS ---
-# Replace the Netlify URL below with your actual Netlify link
-FRONTEND_URL = 'https://your-app-name.netlify.app' 
+# Replace the Netlify URL below with your actual Netlify link' 
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
+    "https://blood-frontend.netlify.app",
     "http://localhost:3000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     FRONTEND_URL,
+    "https://blood-frontend.netlify.app",
     "https://blood-backend-s010.onrender.com"
 ]
 # ----------------------------
