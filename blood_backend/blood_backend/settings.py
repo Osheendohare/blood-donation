@@ -40,6 +40,7 @@ ROOT_URLCONF = 'blood_backend.urls'
 
 # --- CORS & CSRF SETTINGS ---
 # Replace the Netlify URL below with your actual Netlify link' 
+FRONTEND_URL = 'https://blood-frontend.netlify.app'
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
