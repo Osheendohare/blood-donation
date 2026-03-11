@@ -8,11 +8,14 @@ export default function HealthEligibilityForm() {
     donatedRecently: '',
     onMedication: '',
     medicationDetails: '',
-    chronicConditions: '',
+    chronicDisease: '', // Fixed key name consistency
     recentFever: '',
     underageOrUnderweight: '',
     consent: false,
   });
+
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,47 +25,53 @@ export default function HealthEligibilityForm() {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Check consent
-  if (!formData.consent) {
-    alert('❌ You must confirm your consent to proceed.');
-    return;
-  }
+    // Check consent
+    if (!formData.consent) {
+      alert('❌ You must confirm your consent to proceed.');
+      return;
+    }
 
-  // Eligibility conditions
-  if (formData.donatedRecently === 'yes') {
-    alert('❌ You are not eligible to donate blood now because you have donated within the past 3 months.');
-    return;
-  }
+    // Eligibility conditions
+    if (formData.donatedRecently === 'yes') {
+      alert('❌ You are not eligible to donate blood now because you have donated within the past 3 months.');
+      return;
+    }
 
-  if (formData.onMedication === 'yes') {
-    alert('❌ You are currently on medication, so you are not eligible to donate blood now.');
-    return;
-  }
+    if (formData.onMedication === 'yes') {
+      alert('❌ You are currently on medication, so you are not eligible to donate blood now.');
+      return;
+    }
 
-  if (formData.chronicDisease === 'yes') {
-    alert('❌ You have chronic disease, so you are not eligible to donate blood now.');
-    return;
-  }
+    if (formData.chronicDisease === 'yes') {
+      alert('❌ You have chronic disease, so you are not eligible to donate blood now.');
+      return;
+    }
 
-  if (formData.recentFever === 'yes') {
-    alert('❌ You had a fever or infection recently. Please wait at least 14 days to donate blood.');
-    return;
-  }
+    if (formData.recentFever === 'yes') {
+      alert('❌ You had a fever or infection recently. Please wait at least 14 days to donate blood.');
+      return;
+    }
 
-  if (formData.underageOrUnderweight === 'yes') {
-    alert('❌ You must be at least 18 years old and meet minimum weight requirements to donate blood.');
-    return;
-  }
+    if (formData.underageOrUnderweight === 'yes') {
+      alert('❌ You must be at least 18 years old and meet minimum weight requirements to donate blood.');
+      return;
+    }
 
-  // Passed all checks
-  console.log('Submitted Health Info:', formData);
-  alert('✅ Health and eligibility info submitted successfully!');
-  await axios.post('http://localhost:8000/api/donor-health-form/', formData);
-  navigate(`/donor-homepage`);
-};
+    // Passed all checks
+    try {
+      console.log('Submitted Health Info:', formData);
+      // 2. Updated to use the dynamic variable
+      await axios.post(`${API_BASE_URL}/api/donor-health-form/`, formData);
+      alert('✅ Health and eligibility info submitted successfully!');
+      navigate(`/donor-homepage`);
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert('❌ Error submitting health form. Please try again.');
+    }
+  };
 
   return (
     <div className="container mt-5 d-flex justify-content-center">
@@ -144,7 +153,7 @@ const handleSubmit = async (e) => {
               <input
                 type="text"
                 className="form-control"
-                name="medicationDetails"
+                name="chronicDetails"
                 onChange={handleChange}
                 style={{ background: 'wheat', border: '2px solid rgb(100, 4, 92)' }}
               />

@@ -7,6 +7,9 @@ export default function EmergencyAppointment() {
   const [center, setCenter] = useState('');
   const [message, setMessage] = useState('');
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const centerList = Object.values(centers).flat().map(c => `${c.name} – ${c.address}`);
 
   const handleBooking = async () => {
@@ -15,7 +18,7 @@ export default function EmergencyAppointment() {
       return;
     }
 
-    const userId = localStorage.getItem('userId'); // 👈 Get from login storage
+    const userId = localStorage.getItem('userId');
     if (!userId) {
       setMessage('❌ User not logged in. Please log in first.');
       return;
@@ -24,7 +27,8 @@ export default function EmergencyAppointment() {
     const [name, address] = center.split(' – ');
 
     try {
-      const res = await axios.get('http://localhost:8000/api/centers/');
+      // 2. Updated to use dynamic URL for centers fetch
+      const res = await axios.get(`${API_BASE_URL}/api/centers/`);
       const matched = res.data.find(c => c.name === name && c.address === address);
 
       if (!matched) {
@@ -32,8 +36,9 @@ export default function EmergencyAppointment() {
         return;
       }
 
-      await axios.post('http://localhost:8000/api/emergency-appointment/', {
-        user_profile: parseInt(userId),  // 👈 Send user_profile ID
+      // 3. Updated to use dynamic URL for emergency booking
+      await axios.post(`${API_BASE_URL}/api/emergency-appointment/`, {
+        user_profile: parseInt(userId),
         center: matched.id,
         date,
       });

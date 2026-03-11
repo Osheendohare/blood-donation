@@ -14,6 +14,9 @@ export default function EmergencyRegister() {
     confirmPassword: '',
   });
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -36,14 +39,15 @@ export default function EmergencyRegister() {
     // delete payload.confirmPassword;
 
     try {
-      const res = await axios.post('http://localhost:8000/api/emergency-register/', payload);
+      // 2. Updated to use the dynamic variable
+      const res = await axios.post(`${API_BASE_URL}/api/emergency-register/`, payload);
       alert('🚨 Emergency request submitted successfully!');
       navigate(`/emergency-login`);
       console.log('Response:', res.data);
     } catch (error) {
-  const msg = error.response?.data?.error || '❌ Submission failed.';
-  alert(msg);
-}
+      const msg = error.response?.data?.error || '❌ Submission failed.';
+      alert(msg);
+    }
   };
 
   return (

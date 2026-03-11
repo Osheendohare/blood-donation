@@ -9,23 +9,27 @@ import axios from 'axios';
 export default function DonationCampsPage() {
   const [registeredCamps, setRegisteredCamps] = useState([]);
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const handleRegister = async (camp) => {
-    const userId = localStorage.getItem('userId'); // 👈 Get from login storage
+    const userId = localStorage.getItem('userId'); 
     if (!userId) {
       alert('❌ User not logged in. Please log in first.');
       return;
     }
 
     if (registeredCamps.length > 0) {
-    alert("⚠️ You are already registered for another camp. Only one registration allowed.");
-    return;
-  }
+      alert("⚠️ You are already registered for another camp. Only one registration allowed.");
+      return;
+    }
 
-  const confirm = window.confirm(`Are you sure you want to register for "${camp.name}" in ${camp.city}?`);
-  if (!confirm) return;
+    const confirm = window.confirm(`Are you sure you want to register for "${camp.name}" in ${camp.city}?`);
+    if (!confirm) return;
 
     try {
-      const response = await axios.post('http://localhost:8000/api/register-camp/', {
+      // 2. Updated to use the dynamic variable
+      await axios.post(`${API_BASE_URL}/api/register-camp/`, {
         user_profile: parseInt(userId),
         camp_name: camp.name,
         city: camp.city,

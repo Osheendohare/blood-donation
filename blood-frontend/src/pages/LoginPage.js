@@ -10,6 +10,9 @@ export default function LoginPage() {
   });
   const [message, setMessage] = useState('');
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -26,7 +29,8 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post('http://localhost:8000/login/', {
+      // 2. Updated to use the dynamic variable
+      const res = await axios.post(`${API_BASE_URL}/login/`, {
         mobile: mobile.trim(),
         password,
       });
@@ -35,7 +39,7 @@ export default function LoginPage() {
 
       localStorage.setItem('userId', id);
       alert('Login successful!');
-        navigate('/donor-health-form');
+      navigate('/donor-health-form');
     } catch (error) {
       if (error.response?.data?.error) {
         setMessage(error.response.data.error);
@@ -91,10 +95,10 @@ export default function LoginPage() {
           Login
         </button>
         <p className="mt-2 text-center">
-  <Link to="/forgot-password" className="text-warning text-decoration-underline">
-    Forgot Password?
-  </Link>
-</p>
+          <Link to="/forgot-password" className="text-warning text-decoration-underline">
+            Forgot Password?
+          </Link>
+        </p>
 
       </form>
 

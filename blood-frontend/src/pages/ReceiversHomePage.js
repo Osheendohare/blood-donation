@@ -1,9 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
 export default function ReceiverHomePage() {
+  const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
+
+  // 1. Security Check: Redirect if not logged in
+  useEffect(() => {
+    if (!userId) {
+      navigate('/emergency-login');
+    }
+  }, [userId, navigate]);
 
   const sectionStyle = {
     backgroundColor: 'rgba(9, 85, 75, 0.45)',
@@ -20,16 +28,28 @@ export default function ReceiverHomePage() {
     color: 'inherit'
   };
 
+  if (!userId) return null; // Prevent flicker before redirect
+
   return (
     <div className="container mt-5 mb-5">
       <div className="p-4">
         <h2 className="text-center mb-4 fw-bold text-white">🩸 Receiver HomePage 🩸</h2>
         <h5 className="text-center mb-4 fw-bold text-warning">Welcome! Explore our life-saving services below.</h5>
 
-        {/* Emergency Blood Request */}
+        {/* Emergency Blood Request - Uses dynamic userId from localStorage */}
         <div className="text-center mb-5" style={{marginTop:'50px', marginBottom:'60px'}}>
           <Link to={`/suggestions/${userId}`} style={linkStyle}>
-            <Button style={{background:'rgb(18, 20, 128)',border:'2px solid white',fontWeight:'bolder',boxShadow:'0 0 10px white'}} size="lg">🚨 Emergency Blood Request 🚨</Button>
+            <Button 
+              style={{
+                background:'rgb(18, 20, 128)',
+                border:'2px solid white',
+                fontWeight:'bolder',
+                boxShadow:'0 0 10px white'
+              }} 
+              size="lg"
+            >
+              🚨 Emergency Blood Request 🚨
+            </Button>
           </Link>
         </div>
 

@@ -11,6 +11,9 @@ export default function Suggestions() {
   const [message, setMessage] = useState('');
   const [searchText, setSearchText] = useState('');
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   useEffect(() => {
     const fetchSuggestions = async () => {
       setLoading(true);
@@ -30,7 +33,8 @@ export default function Suggestions() {
       }
 
       try {
-        const res = await axios.get(`http://localhost:8000/api/suggestions/${id}/`, {
+        // 2. Updated to use the dynamic variable
+        const res = await axios.get(`${API_BASE_URL}/api/suggestions/${id}/`, {
           params: { latitude: lat, longitude: lon }
         });
 
@@ -50,7 +54,7 @@ export default function Suggestions() {
     };
 
     fetchSuggestions();
-  }, [id]);
+  }, [id, API_BASE_URL]); // Added API_BASE_URL to dependencies for best practice
 
   const handleSearch = (e) => {
     const text = e.target.value.toLowerCase();
@@ -68,21 +72,20 @@ export default function Suggestions() {
 
   return (
     <div className="container mt-4">
-      {/* Top row: search bar on right */}
       <div className="d-flex justify-content-end mb-3">
-  <div className="input-group w-25">
-    <input
-      type="text"
-      className="form-control"
-      placeholder="Search by name, blood group, ward, mobile..."
-      value={searchText}
-      onChange={handleSearch}
-    />
-    <span className="input-group-text bg-dark text-warning">
-      <i className="bi bi-search"></i> {/* Bootstrap Icons search */}
-    </span>
-  </div>
-</div>
+        <div className="input-group w-25">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search by name, blood group, ward, mobile..."
+            value={searchText}
+            onChange={handleSearch}
+          />
+          <span className="input-group-text bg-dark text-warning">
+            <i className="bi bi-search"></i>
+          </span>
+        </div>
+      </div>
 
       <h2 className="text-center mt-2 mb-5 text-white fw-bold">🩸 Suggested Blood Donors 🩸</h2>
 

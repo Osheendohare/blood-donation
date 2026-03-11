@@ -7,6 +7,9 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       const storedId = localStorage.getItem('userId');
@@ -18,8 +21,8 @@ export default function ProfilePage() {
       const userId = parseInt(storedId);
 
       try {
-        // Try donor API first
-        const donorRes = await axios.get('http://127.0.0.1:8000/api/users/');
+        // 2. Updated to use the dynamic variable for Donor API
+        const donorRes = await axios.get(`${API_BASE_URL}/api/users/`);
         const donorMatch = donorRes.data.find((user) => user.id === userId);
 
         if (donorMatch) {
@@ -27,8 +30,8 @@ export default function ProfilePage() {
           return;
         }
 
-        // Try emergency API if donor not found
-        const emergencyRes = await axios.get('http://127.0.0.1:8000/api/emergency-users/');
+        // 3. Updated to use the dynamic variable for Emergency API
+        const emergencyRes = await axios.get(`${API_BASE_URL}/api/emergency-users/`);
         const emergencyMatch = emergencyRes.data.find((user) => user.id === userId);
 
         if (emergencyMatch) {
@@ -45,7 +48,7 @@ export default function ProfilePage() {
     };
 
     fetchUserProfile();
-  }, [navigate]);
+  }, [navigate, API_BASE_URL]); // Added API_BASE_URL to dependencies
 
   const handleLogout = () => {
     const confirmed = window.confirm("Are you sure you want to logout?");

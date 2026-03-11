@@ -10,6 +10,9 @@ export default function LoginPage() {
   });
   const [message, setMessage] = useState('');
 
+  // 1. Define the API Base URL dynamically
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -29,13 +32,15 @@ export default function LoginPage() {
     payload.password = formData.password;
 
     try {
-      const res = await axios.post('http://localhost:8000/api/emergency-login/', payload);
+      // 2. Updated to use the dynamic variable
+      const res = await axios.post(`${API_BASE_URL}/api/emergency-login/`, payload);
       const { id } = res.data;
 
       localStorage.setItem('userId', id);
       setMessage('Login successful!');
-        navigate(`/receiver-homepage/`);
+      navigate(`/receiver-homepage/`);
     } catch (error) {
+      console.error("Login Error:", error);
       setMessage('Invalid credentials. Please try again.');
     }
   };
@@ -83,17 +88,16 @@ export default function LoginPage() {
           Login
         </button>
         <p className="mt-2 text-center">
-  <Link to="/forgot-password" className="text-warning text-decoration-underline">
-    Forgot Password?
-  </Link>
-</p>
-
+          <Link to="/forgot-password" className="text-warning text-decoration-underline">
+            Forgot Password?
+          </Link>
+        </p>
       </form>
    
       <p className="mt-4 text-center">
-  New user?{' '} 
-  <Link to="/emergency-register" className="text-warning text-decoration-underline">Registration Now</Link>
-</p>
+        New user?{' '} 
+        <Link to="/emergency-register" className="text-warning text-decoration-underline">Registration Now</Link>
+      </p>
     </div>
   );
 }
